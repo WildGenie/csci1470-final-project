@@ -46,15 +46,14 @@ def batch_data(data, batch_size=1):
 
     overall_length = len(data)
 
-    for i in range(0, overall_length - (overall_length % batch_size)):
+    for i in range(overall_length - (overall_length % batch_size)):
         x = data[i: i + batch_size]
 
         if i + batch_size == overall_length:
             break
-        else:
-            y = data[i + batch_size]
-            dataX.append(x)
-            dataY.append(y)
+        y = data[i + batch_size]
+        dataX.append(x)
+        dataY.append(y)
 
     return np.array(dataX), np.array(dataY)
 
@@ -109,23 +108,23 @@ def metrics(y_test, y_hat, price_point):
     # calculate f_measure
     f_measure = 2 * precision * recall / (precision + recall)
 
-    print("###LSTM-Only TEST RESULTS for " + price_point + " ###")
+    print(f"###LSTM-Only TEST RESULTS for {price_point} ###")
     print("-------------------")
-    print("Test Root Mean Squared Error: " + str(lstm_rmse))
+    print(f"Test Root Mean Squared Error: {str(lstm_rmse)}")
     print("-------------------")
-    print("Test Mean Absolute Percentage Error: " + str(lstm_mape))
+    print(f"Test Mean Absolute Percentage Error: {str(lstm_mape)}")
     print("-------------------")
     print("Test Symmetric Mean Absolute Percentage Error: " + str(lstm_smape))
     print("-------------------")
     print("Test Adjusted Symmetric Mean Absolute Percentage Error: " + str(lstm_smape_adjusted))
     print("-------------------")
-    print("Test Precision: " + str(precision))
+    print(f"Test Precision: {str(precision)}")
     print("-------------------")
-    print("Test Recall: " + str(recall))
+    print(f"Test Recall: {str(recall)}")
     print("-------------------")
-    print("Test Accuracy: " + str(accuracy))
+    print(f"Test Accuracy: {str(accuracy)}")
     print("-------------------")
-    print("Test F-Measure: " + str(f_measure))
+    print(f"Test F-Measure: {str(f_measure)}")
     print("-------------------")
     print("###END OF RESULTS###")
 

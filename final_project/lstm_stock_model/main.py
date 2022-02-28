@@ -45,7 +45,7 @@ def batch_data(data, batch_size=1):
 
     overall_length = len(data)
 
-    for i in range(0, overall_length - (batch_size + 1)):
+    for i in range(overall_length - (batch_size + 1)):
 
         if i == overall_length - (batch_size + 1):
             y = data[i + 1: i + 1 + batch_size]
@@ -109,7 +109,7 @@ def test(model, x_test, y_true, scaler):
     """
     correct_predictions = []
 
-    for i in range(0, len(x_test)):
+    for i in range(len(x_test)):
         test_predictions = model.call(x_test[i])
         # add price prediction (as actual prices) to output list
         correct_predictions.append(test_predictions[0][-1])
@@ -157,13 +157,13 @@ def visualize_results(real_stock_price, predicted_stock_price, train_or_test, fi
     plt.figure(fig_num)
     plt.plot(real_stock_price, color='black', label='Stock Price')
     plt.plot(predicted_stock_price, color='green', label='Predicted Stock Price')
-    plt.title('Stock Price Prediction: ' + train_or_test)
+    plt.title(f'Stock Price Prediction: {train_or_test}')
     plt.xlabel('Time')
     plt.ylabel('Stock Price')
     plt.legend()
     plt.show()
     rand_int = randrange(10000)
-    plt.savefig('../../data/images/fig' + str(rand_int) + '.png')
+    plt.savefig(f'../../data/images/fig{str(rand_int)}.png')
 
 
 def run_model(data, price_point, batch_size):
@@ -180,8 +180,8 @@ def run_model(data, price_point, batch_size):
     training_size = int(len(fit_data) * 0.65)
 
     # get our data by train and test:
-    train_data = fit_data[0: training_size]
-    test_data = fit_data[training_size: len(fit_data)]
+    train_data = fit_data[:training_size]
+    test_data = fit_data[training_size:]
 
     # BEGIN MODEL
 
@@ -193,17 +193,14 @@ def run_model(data, price_point, batch_size):
 
     # batch the test data:
     x_test, y_test = batch_data(test_data, model.batch_size)
-    y_test_single_vals = []
-    for array in y_test:
-        y_test_single_vals.append(array[-1])
-
+    y_test_single_vals = [array[-1] for array in y_test]
     test_data_without_scale = \
         scaler.inverse_transform(np.array(y_test_single_vals).reshape(-1, 1))
 
     # train the model:
     NUM_EPOCHS = 1
 
-    for epoch in range(NUM_EPOCHS):
+    for _ in range(NUM_EPOCHS):
         train(model, x_train, y_train)
         model.reset_states()
 
@@ -214,27 +211,27 @@ def run_model(data, price_point, batch_size):
     predictions = np.array(predictions).reshape(-1, 1)
     predictions_without_scale = scaler.inverse_transform(predictions)
 
-    print("###LSTM-Only TEST RESULTS for " + price_point + " ###")
+    print(f"###LSTM-Only TEST RESULTS for {price_point} ###")
     print("-------------------")
-    print("Test Root Mean Squared Error: " + str(lstm_rmse))
+    print(f"Test Root Mean Squared Error: {str(lstm_rmse)}")
     print("-------------------")
-    print("Test Mean Absolute Percentage Error: " + str(lstm_mape))
+    print(f"Test Mean Absolute Percentage Error: {str(lstm_mape)}")
     print("-------------------")
     print("Test Symmetric Mean Absolute Percentage Error: " + str(lstm_smape))
     print("-------------------")
     print("Test Adjusted Symmetric Mean Absolute Percentage Error: " + str(lstm_smape_adjusted))
     print("-------------------")
-    print("Test Precision: " + str(precision))
+    print(f"Test Precision: {str(precision)}")
     print("-------------------")
-    print("Test Recall: " + str(recall))
+    print(f"Test Recall: {str(recall)}")
     print("-------------------")
-    print("Test Accuracy: " + str(accuracy))
+    print(f"Test Accuracy: {str(accuracy)}")
     print("-------------------")
-    print("Test F-Measure: " + str(f_measure))
+    print(f"Test F-Measure: {str(f_measure)}")
     print("-------------------")
     print("###END OF RESULTS###")
 
-    title = "TEST PREDICTIONS for " + price_point + " (LSTM Only Model)"
+    title = f"TEST PREDICTIONS for {price_point} (LSTM Only Model)"
 
     visualize_results(test_data_without_scale, predictions_without_scale, title, 0)
 
@@ -255,28 +252,28 @@ def main():
 
     # Date:
     dates = data.reset_index()["Date"]
-    test_dates = dates[training_size: len(dates)]
-    dates_for_charts = test_dates[BATCH_SIZE: len(test_dates)].reset_index()["Date"]
+    test_dates = dates[training_size:]
+    dates_for_charts = test_dates[BATCH_SIZE:].reset_index()["Date"]
 
     # Open:
     real_open = data.reset_index()["Open"]
-    test_open = real_open[training_size: len(real_open)]
-    open_for_chart = test_open[BATCH_SIZE: len(test_open)].reset_index()["Open"]
+    test_open = real_open[training_size:]
+    open_for_chart = test_open[BATCH_SIZE:].reset_index()["Open"]
 
     # High
     real_high = data.reset_index()["High"]
-    test_high = real_high[training_size: len(real_high)]
-    high_for_chart = test_high[BATCH_SIZE: len(test_high)].reset_index()["High"]
+    test_high = real_high[training_size:]
+    high_for_chart = test_high[BATCH_SIZE:].reset_index()["High"]
 
     # High
     real_low = data.reset_index()["Low"]
-    test_low = real_low[training_size: len(real_low)]
-    low_for_chart = test_low[BATCH_SIZE: len(test_low)].reset_index()["Low"]
+    test_low = real_low[training_size:]
+    low_for_chart = test_low[BATCH_SIZE:].reset_index()["Low"]
 
     # High
     real_close = data.reset_index()["Close"]
-    test_close = real_close[training_size: len(real_close)]
-    close_for_chart = test_close[BATCH_SIZE: len(test_close)].reset_index()["Close"]
+    test_close = real_close[training_size:]
+    close_for_chart = test_close[BATCH_SIZE:].reset_index()["Close"]
 
     title1 = "SPX Actual Candles for Test Data"
 
